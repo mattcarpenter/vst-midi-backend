@@ -41,6 +41,8 @@
     <ClCompile Include="..\..\WDL\IPlug\IPlugVST3.cpp">
       <Filter>vst3</Filter>
     </ClCompile>
+    <ClCompile Include="webviewbridge.c" />
+    <ClCompile Include="WebViewWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IPlugMonoSynth.h" />
@@ -141,6 +143,9 @@
     <ClInclude Include="..\..\WDL\IPlug\IPlugVST3.h">
       <Filter>vst3</Filter>
     </ClInclude>
+    <ClInclude Include="webview.h" />
+    <ClInclude Include="webviewbridge.h" />
+    <ClInclude Include="WebViewWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="vst3">

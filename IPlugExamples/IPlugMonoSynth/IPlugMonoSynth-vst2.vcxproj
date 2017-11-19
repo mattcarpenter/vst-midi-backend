@@ -238,10 +238,15 @@
     <ClInclude Include="..\..\WDL\IPlug\IPlugVST.h" />
     <ClInclude Include="IPlugMonoSynth.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="webview.h" />
+    <ClInclude Include="webviewbridge.h" />
+    <ClInclude Include="WebViewWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\WDL\IPlug\IPlugVST.cpp" />
     <ClCompile Include="IPlugMonoSynth.cpp" />
+    <ClCompile Include="webviewbridge.c" />
+    <ClCompile Include="WebViewWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="IPlugMonoSynth.rc" />

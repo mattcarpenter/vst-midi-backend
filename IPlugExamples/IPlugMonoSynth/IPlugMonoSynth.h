@@ -3,6 +3,7 @@
 
 #include "IPlug_include_in_plug_hdr.h"
 #include "IMidiQueue.h"
+#include "WebViewWrapper.h"
 
 // http://www.musicdsp.org/archive.php?classid=3#257
 
@@ -36,6 +37,7 @@ public:
 private:
   IBitmapOverlayControl* mAboutBox;
   IControl* mKeyboard;
+  WebViewWrapper* mWebViewWrapper;
   int mMeterIdx_L, mMeterIdx_R;
 
   IMidiQueue mMidiQueue;

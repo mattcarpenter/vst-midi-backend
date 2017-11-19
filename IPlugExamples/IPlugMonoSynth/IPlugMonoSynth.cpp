@@ -5,7 +5,6 @@
 #include "IControl.h"
 #include "IKeyboardControl.h"
 
-
 const int kNumPrograms = 8;
 
 #define PITCH 440.
@@ -39,7 +38,7 @@ IPlugMonoSynth::IPlugMonoSynth(IPlugInstanceInfo instanceInfo)
   TRACE;
 
   memset(mKeyStatus, 0, 128 * sizeof(bool));
-
+  
   //arguments are: name, defaultVal, minVal, maxVal, step, label
   GetParam(kGainL)->InitDouble("GainL", -12.0, -70.0, 12.0, 0.1, "dB");
   GetParam(kGainR)->InitDouble("GainR", -12.0, -70.0, 12.0, 0.1, "dB");
@@ -53,7 +52,7 @@ IPlugMonoSynth::IPlugMonoSynth(IPlugInstanceInfo instanceInfo)
 
   IGraphics* pGraphics = MakeGraphics(this, kWidth, kHeight);
   pGraphics->AttachBackground(BG_ID, BG_FN);
-
+  
   IBitmap knob = pGraphics->LoadIBitmap(KNOB_ID, KNOB_FN, kKnobFrames);
   IText text = IText(14);
   IBitmap regular = pGraphics->LoadIBitmap(WHITE_KEY_ID, WHITE_KEY_FN, 6);
@@ -72,6 +71,8 @@ IPlugMonoSynth::IPlugMonoSynth(IPlugInstanceInfo instanceInfo)
 
   //MakePreset("preset 1", ... );
   MakeDefaultPreset((char *) "-", kNumPrograms);
+
+  mWebViewWrapper = new WebViewWrapper();
 }
 
 IPlugMonoSynth::~IPlugMonoSynth() {}
@@ -97,7 +98,8 @@ void IPlugMonoSynth::ProcessDoubleReplacing(double** inputs, double** outputs, i
     {
       msg.MakeNoteOffMsg(mKey + 48, 0, 0);
       mMidiQueue.Add(&msg);
-    }
+	  this->mWebViewWrapper->SendMidiMsg(msg);
+	}
 
     mKey = pKeyboard->GetKey();
 
@@ -105,6 +107,7 @@ void IPlugMonoSynth::ProcessDoubleReplacing(double** inputs, double** outputs, i
     {
       msg.MakeNoteOnMsg(mKey + 48, pKeyboard->GetVelocity(), 0, 0);
       mMidiQueue.Add(&msg);
+	  this->mWebViewWrapper->SendMidiMsg(msg);
     }
   }
 
@@ -231,6 +234,7 @@ void IPlugMonoSynth::ProcessMidiMsg(IMidiMsg* pMsg)
 
   mKeyboard->SetDirty();
   mMidiQueue.Add(pMsg);
+  this->mWebViewWrapper->SendMidiMsg(*(pMsg));
 }
 
 // Should return non-zero if one or more keys are playing.
