@@ -41,6 +41,7 @@ private:
   int mMeterIdx_L, mMeterIdx_R;
 
   IMidiQueue mMidiQueue;
+  IMidiQueue mOutMidiQueue;
 
   int mNumKeys; // how many keys are being played (via midi)
   bool mKeyStatus[128]; // array of on/off for each key

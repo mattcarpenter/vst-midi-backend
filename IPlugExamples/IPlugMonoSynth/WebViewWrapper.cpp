@@ -3,18 +3,51 @@
 #include <iostream>
 #include <thread>
 
-extern "C" void init_webview();
+extern "C" void init_webview(void(*cbPtr)(const char*));
 extern "C" void execute_js(const char* js);
+
+static std::function<void(const char*)> instanceCallback;
+
+using namespace std::placeholders;
 
 WebViewWrapper::WebViewWrapper()
 {
-	this->mThread = std::thread(init_webview);
+	instanceCallback = std::bind(&WebViewWrapper::ReceiveMidiMsg, this, _1);
+
+	this->mThread = std::thread([this]() {
+		init_webview([](const char* args) {
+			instanceCallback(args);
+		});
+	});
 	this->mThread.detach();
 }
 
 
 WebViewWrapper::~WebViewWrapper()
 {
+}
+
+void WebViewWrapper::SetReceiveMidiMsgCallback(std::function<void(int,int,int)> cb)
+{
+	this->receiveMidiMsgCallback = cb;
+}
+
+void WebViewWrapper::ReceiveMidiMsg(const char* arg)
+{
+	// TODO - Send & parse JSON or something instead
+	char buffer[255];
+	int noteNumber = 0;
+	int velocity = 0;
+	int status = 0;
+
+	sprintf(buffer, "%s", arg);
+	char* pch = strtok(buffer, ",");
+	noteNumber = atoi(pch);
+	pch = strtok(NULL, ",");
+	status = atoi(pch);
+	pch = strtok(NULL, ",");
+	velocity = atoi(pch);
+	this->receiveMidiMsgCallback(noteNumber, status, velocity);
 }
 
 void WebViewWrapper::SendMidiMsg(IMidiMsg note)

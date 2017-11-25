@@ -71,8 +71,26 @@ IPlugMonoSynth::IPlugMonoSynth(IPlugInstanceInfo instanceInfo)
 
   //MakePreset("preset 1", ... );
   MakeDefaultPreset((char *) "-", kNumPrograms);
-
+ 
   mWebViewWrapper = new WebViewWrapper();
+  mWebViewWrapper->SetReceiveMidiMsgCallback([this](int noteNumber, int status, int velocity) {
+	  mMutex.Enter();
+	  IMidiMsg *msg = (struct IMidiMsg*) malloc(sizeof(struct IMidiMsg));
+	  
+	  if (status == 9) {
+		  msg->MakeNoteOnMsg(noteNumber, velocity, 0, 0);
+	  }
+	  else {
+		  msg->MakeNoteOffMsg(noteNumber, 0, 0);
+	  }
+	  
+	  mOutMidiQueue.Add(msg);
+
+#if !defined(OS_WIN) && !defined(SA_API)
+	  	SendMidiMsg(&msg);
+#endif
+	  mMutex.Leave();
+  });
 }
 
 IPlugMonoSynth::~IPlugMonoSynth() {}
@@ -113,15 +131,20 @@ void IPlugMonoSynth::ProcessDoubleReplacing(double** inputs, double** outputs, i
 
   for (int offset = 0; offset < nFrames; ++offset, /*++in1, ++in2,*/ ++out1, ++out2)
   {
+	// Flush MIDI out queue
+	while (!mOutMidiQueue.Empty())
+	{
+		IMidiMsg* pMsg = mOutMidiQueue.Peek();
+#if !defined(OS_WIN) && !defined(SA_API)
+		SendMidiMsg(pMsg);
+#endif
+		mOutMidiQueue.Remove();
+	}
+
     while (!mMidiQueue.Empty())
     {
       IMidiMsg* pMsg = mMidiQueue.Peek();
       if (pMsg->mOffset > offset) break;
-
-      // TODO: make this work on win sa
-#if !defined(OS_WIN) && !defined(SA_API)
-      SendMidiMsg(pMsg);
-#endif
 
       int status = pMsg->StatusMsg();
 
@@ -177,6 +200,7 @@ void IPlugMonoSynth::ProcessDoubleReplacing(double** inputs, double** outputs, i
   }
 
   mMidiQueue.Flush(nFrames);
+  mOutMidiQueue.Flush(nFrames);
 }
 
 void IPlugMonoSynth::Reset()

@@ -42,8 +42,11 @@ public:
 	WebViewWrapper();
 	~WebViewWrapper();
 	void SendMidiMsg(IMidiMsg msg);
+	void ReceiveMidiMsg(const char* msg);
+	void SetReceiveMidiMsgCallback(std::function<void(int, int, int)> cb);
 private:
 	std::thread mThread;
 	webview mWebview;
+	std::function<void(int,int,int)> receiveMidiMsgCallback;
 };
 

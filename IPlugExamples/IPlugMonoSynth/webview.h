@@ -829,7 +829,7 @@ extern "C" {
 		webBrowser2->lpVtbl->put_Top(webBrowser2, 0);
 		webBrowser2->lpVtbl->put_Width(webBrowser2, rect.right);
 		webBrowser2->lpVtbl->put_Height(webBrowser2, rect.bottom);
-		webBrowser2->lpVtbl->put_Silent(webBrowser2, 1);
+	//	webBrowser2->lpVtbl->put_Silent(webBrowser2, VARIANT_TRUE);
 		webBrowser2->lpVtbl->Release(webBrowser2);
 
 		return 0;

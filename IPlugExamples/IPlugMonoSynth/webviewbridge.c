@@ -3,6 +3,7 @@
 #include "webview.h"
 
 void callback(struct webview *w, const char *arg);
+void(*callbackPtr)(const char*);
 
 struct webview wv = {
 	.title = "Webview",
@@ -13,9 +14,10 @@ struct webview wv = {
 	.external_invoke_cb = callback,
 };
 
-void init_webview()
+void init_webview(void (*cbPtr)(const char*))
 {
 	webview_init(&wv);
+	callbackPtr = cbPtr;
 	while (webview_loop(&wv, 1) == 0);
 	webview_exit(&wv);
 }
@@ -35,5 +37,5 @@ void execute_js(const char* js)
 }
 
 void callback(struct webview *w, const char *arg) {
-
+	callbackPtr(arg);
 }
