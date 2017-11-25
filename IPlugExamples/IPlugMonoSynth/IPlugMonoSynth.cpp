@@ -85,10 +85,6 @@ IPlugMonoSynth::IPlugMonoSynth(IPlugInstanceInfo instanceInfo)
 	  }
 	  
 	  mOutMidiQueue.Add(msg);
-
-#if !defined(OS_WIN) && !defined(SA_API)
-	  	SendMidiMsg(&msg);
-#endif
 	  mMutex.Leave();
   });
 }
@@ -131,16 +127,19 @@ void IPlugMonoSynth::ProcessDoubleReplacing(double** inputs, double** outputs, i
 
   for (int offset = 0; offset < nFrames; ++offset, /*++in1, ++in2,*/ ++out1, ++out2)
   {
-	// Flush MIDI out queue
+	// Flush output queue
 	while (!mOutMidiQueue.Empty())
 	{
-		IMidiMsg* pMsg = mOutMidiQueue.Peek();
-#if !defined(OS_WIN) && !defined(SA_API)
-		SendMidiMsg(pMsg);
-#endif
+		IMidiMsg* pOutMsg = mOutMidiQueue.Peek();
+		char buff[255];
+		sprintf(buff, "hello");
+//#if !defined(OS_WIN) && !defined(SA_API)
+		SendMidiMsg(pOutMsg);
+//#endif
 		mOutMidiQueue.Remove();
 	}
 
+	// Flush input queue
     while (!mMidiQueue.Empty())
     {
       IMidiMsg* pMsg = mMidiQueue.Peek();
@@ -155,6 +154,7 @@ void IPlugMonoSynth::ProcessDoubleReplacing(double** inputs, double** outputs, i
         {
           int velocity = pMsg->Velocity();
           // Note On
+		  SendMidiMsg(pMsg);
           if (status == IMidiMsg::kNoteOn && velocity)
           {
             mNote = pMsg->NoteNumber();
