@@ -153,8 +153,13 @@ void IPlugMonoSynth::ProcessDoubleReplacing(double** inputs, double** outputs, i
         case IMidiMsg::kNoteOff:
         {
           int velocity = pMsg->Velocity();
+
+		  if (pMsg->Channel() == 0) {
+			  // Only echo back notes from channel 0
+			  SendMidiMsg(pMsg);
+		  }
+
           // Note On
-		  SendMidiMsg(pMsg);
           if (status == IMidiMsg::kNoteOn && velocity)
           {
             mNote = pMsg->NoteNumber();
@@ -235,7 +240,7 @@ void IPlugMonoSynth::ProcessMidiMsg(IMidiMsg* pMsg)
 {
   int status = pMsg->StatusMsg();
   int velocity = pMsg->Velocity();
-
+  
   switch (status)
   {
     case IMidiMsg::kNoteOn:

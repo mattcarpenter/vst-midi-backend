@@ -56,7 +56,8 @@ void WebViewWrapper::SendMidiMsg(IMidiMsg note)
 	int status = note.StatusMsg();
 	int velocity = note.Velocity();
 	int noteNumber = note.NoteNumber();
+	int channel = note.Channel();
 	char buffer[512];
-	sprintf(buffer, "window.sendNote(%i, %i, %i);", noteNumber, status, velocity);
+	sprintf(buffer, "window.sendNote(%i, %i, %i, %i);", channel, noteNumber, status, velocity);
 	execute_js(buffer);
 }
